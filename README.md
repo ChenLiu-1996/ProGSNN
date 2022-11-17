@@ -29,5 +29,11 @@ conda install scikit-image pillow -c anaconda
 ## Usage
 ```
 cd src/scripts
+
+# Remember to uncomment the line:
+# `os.system('python step_01_get_data.py --protein_name %s' % (protein_name))`
+# if you are running it for the first time.
+# Also, remember to update the data path in `src/scripts/step_01_get_data.py` to match your local data path.
+
 python run_all.py
 ```
