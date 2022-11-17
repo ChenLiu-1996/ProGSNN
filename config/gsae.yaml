@@ -1,0 +1,11 @@
+n_epochs: 40
+len_epoch: None
+batch_size: 100
+gpu_ids: 0,
+num_workers: 4
+bottle_dim: 25
+hidden_dim: 400
+learning_rate: 0.00025
+beta: 0.0005
+patience: 5 # early stop patience
+grad_clip: 10 # gradient clipping

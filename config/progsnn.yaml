@@ -1,0 +1,14 @@
+n_epochs: 500
+batch_size: 64
+gpu_ids: 0,
+num_workers: 4
+latent_dim: 128
+hidden_dim: 256
+embedding_dim: 128
+probs: 0.2
+nhead: 3  # Note: In MultiHeadAttention, embed_dim % num_heads == 0
+lr: 0.001
+layers: 2
+patience: 5 # early stop patience
+grad_clip: 10 # gradient clipping
+task: 'reg'

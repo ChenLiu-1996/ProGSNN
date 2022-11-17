@@ -1,0 +1,13 @@
+.vscode
+data
+**/__pycache__
+input_graphs/*
+output_numpy/*
+train_logs/*
+
+# Models
+**/checkpoints/*
+**/*.pt
+**/*.pkl
+**/*.pth
+**/*.pth.tar
