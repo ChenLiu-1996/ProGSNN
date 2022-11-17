@@ -2,10 +2,16 @@
 ### Krishnaswamy Lab, Yale University
 
 Contributors:
-Chen Liu (chen.liu.cl2482@yale.edu)
-Egbert Castro (egbert.castro@yale.edu)
-Dhananjay Bhaskar (dhananjay_bhaskar@brown.edu)
+- Egbert Castro (egbert.castro@yale.edu)
+- Dhananjay Bhaskar (dhananjay_bhaskar@brown.edu)
+- Chen Liu (chen.liu.cl2482@yale.edu)
 
+## Cite
+```
+ProGSNN: Deep Multi-Scale Protein Representation Learning using Geometric Scattering
+Egbert Castro, Dhananjay Bhaskar, Jackson Grady, Alex Grigas, Michael Perlmutter, Corey S. O'Hern, Smita Krishnaswamy
+NeurIPS 2021 Learning Meaningful Representations of Life Workshop
+```
 
 ## Dependencies
 We developed the codebase in a miniconda environment.
@@ -22,4 +28,6 @@ conda install scikit-image pillow -c anaconda
 
 ## Usage
 ```
+cd src/scripts
+python run_all.py
 ```
