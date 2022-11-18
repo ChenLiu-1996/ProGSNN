@@ -43,12 +43,14 @@ class Scatter(torch.nn.Module):
         `J`:   scattering order.
     """
 
-    def __init__(self,
-                 in_channels: int,
-                 trainable_laziness: bool = False,
-                 trainable_wavelets: bool = True,
-                 skip_aggregation: bool = False,
-                 device: torch.device = torch.device('cpu')) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        trainable_laziness: bool = False,
+        trainable_wavelets: bool = True,
+        skip_aggregation: bool = False,
+        device: torch.device = torch.device('cpu')
+    ) -> None:
         super(Scatter, self).__init__()
 
         self.in_channels = in_channels
@@ -59,13 +61,15 @@ class Scatter(torch.nn.Module):
         # `J`. Currently only implemented for 4.
         self.scattering_order = 4
 
-        self.diffusion_layer1 = Diffuse(in_channels=in_channels,
-                                        out_channels=in_channels,
-                                        trainable_laziness=trainable_laziness).to(self.device)
+        self.diffusion_layer1 = Diffuse(
+            in_channels=in_channels,
+            out_channels=in_channels,
+            trainable_laziness=trainable_laziness).to(self.device)
 
-        self.diffusion_layer2 = Diffuse(in_channels=4 * in_channels,
-                                        out_channels=4 * in_channels,
-                                        trainable_laziness=trainable_laziness).to(self.device)
+        self.diffusion_layer2 = Diffuse(
+            in_channels=4 * in_channels,
+            out_channels=4 * in_channels,
+            trainable_laziness=trainable_laziness).to(self.device)
 
         # Weightings for the 0th to 2^Jth diffusion wavelets.
         self.wavelet_constructor = torch.nn.Parameter(
@@ -135,20 +139,24 @@ class Scatter(torch.nn.Module):
         if not self.skip_aggregation:
             if hasattr(graph_data, 'batch') and graph_data.batch is not None:
                 x = self.aggregation_submodule(graph=x,
-                                            batch_indices=graph_data.batch,
-                                            moments_returned=4)
+                                               batch_indices=graph_data.batch,
+                                               moments_returned=4)
             else:
                 x = self.aggregation_submodule(graph=x,
-                                            batch_indices=torch.zeros(
-                                                graph_data.x.shape[0],
-                                                dtype=torch.int32),
-                                            moments_returned=4)
+                                               batch_indices=torch.zeros(
+                                                   graph_data.x.shape[0],
+                                                   dtype=torch.int32),
+                                               moments_returned=4)
 
         return x, self.wavelet_constructor
 
     def out_shape(self):
-        # x * 4 moments * in
+        # x * 4 moments * in_channels
         return 11 * 4 * self.in_channels
+
+    def out_shape_skip_aggregation(self):
+        # x * in_channels
+        return 11 * self.in_channels
 
 
 def feng_filters():

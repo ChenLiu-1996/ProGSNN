@@ -38,16 +38,16 @@ class ProGSNN(TGTransformerBaseModel):
         self.batch_size = hparams.batch_size
 
         # Encoder
-        self.scattering_network = Scatter(self.input_dim,
+        self.scattering_network = Scatter(in_channels=self.input_dim,
                                           skip_aggregation=True)
 
         self.pos_encoder = PositionalEncoding(
-            d_model=self.scattering_network.out_shape(),
+            d_model=self.scattering_network.out_shape_skip_aggregation(),
             max_len=self.max_seq_len)
 
         self.row_encoder = TransformerEncoder(
             num_layers=self.layers,
-            input_dim=self.scattering_network.out_shape(),
+            input_dim=self.scattering_network.out_shape_skip_aggregation(),
             num_heads=self.nhead,
             dim_feedforward=self.hidden_dim,
             dropout=self.probs)
@@ -58,9 +58,10 @@ class ProGSNN(TGTransformerBaseModel):
                                               dim_feedforward=self.hidden_dim,
                                               dropout=self.probs)
 
-        # auxiliary network
+        # Auxiliary network
         self.bottleneck_module = BaseBottleneck(
-            self.scattering_network.out_shape(), self.latent_dim)
+            self.scattering_network.out_shape_skip_aggregation(),
+            self.latent_dim)
 
         # Property prediction
         # self regressor module
@@ -69,12 +70,13 @@ class ProGSNN(TGTransformerBaseModel):
 
         # Reconstruction of the scattering coefficients.
         # self.recon = nn.Sequential(
-        #     nn.Linear(self.scattering_network.out_shape(), self.hidden_dim),
+        #     nn.Linear(self.scattering_network.out_shape_skip_aggregation(), self.hidden_dim),
         #     nn.ReLU(),
-        #     nn.Linear(self.hidden_dim, self.scattering_network.out_shape()))
+        #     nn.Linear(self.hidden_dim, self.scattering_network.out_shape_skip_aggregation()))
         self.recon = nn.Sequential(
             nn.Linear(self.latent_dim, self.hidden_dim), nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.scattering_network.out_shape()))
+            nn.Linear(self.hidden_dim,
+                      self.scattering_network.out_shape_skip_aggregation()))
 
         self.loss_list = []
 
@@ -89,8 +91,10 @@ class ProGSNN(TGTransformerBaseModel):
         # Zero-pad the coefficients to the same dimension for the transformer modules.
         # [batch_size, max_node_size, coeff_dim].
         coeffs = to_dense_batch(raw_coeffs, batch.batch)[0]
-        coeffs = coeffs.reshape(batch.num_graphs, -1,
-                                self.scattering_network.out_shape())
+
+        coeffs = coeffs.reshape(
+            batch.num_graphs, -1,
+            self.scattering_network.out_shape_skip_aggregation())
         padding = self.generate_zero_padding(coeffs)
         coeffs = torch.cat((coeffs, padding), dim=1)
         return coeffs
@@ -100,7 +104,7 @@ class ProGSNN(TGTransformerBaseModel):
         Args:
             max_seq_len (int): sequence length
         Returns:
-            torch tensor : returns upper tri tensor of shape (S x S )
+            torch tensor : returns upper tri tensor of shape (S x S)
         """
         mask = torch.ones((self.max_seq_len, self.max_seq_len),
                           device=self.device)

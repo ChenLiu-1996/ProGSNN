@@ -20,15 +20,15 @@ from utils.parse import parse_hparams
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument(
-        '--config', help='Path to config yaml file.')
+    parser.add_argument('--config', help='Path to config yaml file.')
     parser.add_argument('--protein_name', type=str, required=True)
     parser.add_argument('--model', type=str, required=True)
     parser.add_argument('--alpha', type=float, required=True)
     parser.add_argument('--random_seed', type=int, default=1)
     parser.add_argument('--save_root', default='../../train_logs/', type=str)
-    parser.add_argument(
-        '--dataset_path', default='../../input_graphs/', type=str)
+    parser.add_argument('--dataset_path',
+                        default='../../input_graphs/',
+                        type=str)
 
     # add args from trainer
     parser = pl.Trainer.add_argparse_args(parser)
@@ -43,7 +43,8 @@ if __name__ == '__main__':
     # We cannot use `args.deterministic = True` because it's currently incompatible with the
     # scattering operation: `torch_scatter.scatter()`.
     # It will trigger the error:
-    #     scatter_add_cuda_kernel does not have a deterministic implementation, but you set 'torch.use_deterministic_algorithms(True)
+    #     scatter_add_cuda_kernel does not have a deterministic implementation,
+    #     but you set 'torch.use_deterministic_algorithms(True)
     # According to https://github.com/pytorch/pytorch/issues/50469, this is a known imperfection.
     # We can only accept it that the randoms state control is not in place for the model training.
     pl.seed_everything(args.random_seed)
@@ -65,9 +66,9 @@ if __name__ == '__main__':
 
     train_size = int(0.8 * len(full_dataset))
     val_size = len(full_dataset) - train_size
-    train_set, val_set = torch.utils.data.random_split(full_dataset,
-                                                       [train_size, val_size],
-                                                       generator=torch.Generator().manual_seed(args.random_seed))
+    train_set, val_set = torch.utils.data.random_split(
+        full_dataset, [train_size, val_size],
+        generator=torch.Generator().manual_seed(args.random_seed))
 
     # train loader
     train_loader = DataLoader(train_set,
@@ -84,7 +85,8 @@ if __name__ == '__main__':
     now = datetime.datetime.now()
     date_suffix = now.strftime("%Y-%m-%d-%M")
     save_dir = '%s/%s/%s_logs_run_deshaw_%s_alpha=%s_%s/' % (
-        args.save_root, args.protein_name, args.model, args.protein_name, args.alpha, date_suffix)
+        args.save_root, args.protein_name, args.model, args.protein_name,
+        args.alpha, date_suffix)
 
     # early stopping
     early_stop_callback = EarlyStopping(monitor='val_loss',

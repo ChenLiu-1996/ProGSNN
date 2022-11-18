@@ -52,7 +52,7 @@ class DEShaw(Dataset):
         for i in range(graph.num_nodes):
             acid_presence = np.zeros(len(self.amino_acid_dict))
             acid = nodes[i]
-            _, acid_abbv, index = acid.split(':')
+            _, acid_abbv, _ = acid.split(':')
             acid_idx = self.amino_acid_dict[acid_abbv]
             acid_presence[acid_idx] = 1
             features.append(acid_presence)
